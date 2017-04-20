@@ -1,0 +1,4 @@
+Simple program to load a JPEG file, manipulate the data (YUV I420),
+and store the result as a JPEG file.
+
+Depends on libjpeg
