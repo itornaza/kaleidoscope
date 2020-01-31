@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Call out to "my function" */
-  my_function(yuvbuf_in, width, height, yuvbuf_out);
+  my_function(yuvbuf_in, width, height, yuvbuf_out, 24);
 
   write_i420_to_jpeg(yuvbuf_out, width, height, outpath);
 

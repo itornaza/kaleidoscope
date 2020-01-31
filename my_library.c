@@ -70,17 +70,16 @@ void my_crazy_function(uint8_t *yuvbuf_in, int width, int height,
 /**
  * my_function
  *
- * Implements the kaleidoscope effect
+ * Implements the kaleidoscope effect with adjustable number of sectors
  */
 void my_function(uint8_t *yuvbuf_in, int width, int height,
-                 uint8_t *yuvbuf_out) {
+                 uint8_t *yuvbuf_out, int n_sectors) {
 
   //---------------------------------------------------------------------------
   // Local variables
   //---------------------------------------------------------------------------
 
   // Trigonometry
-  int n_sectors = 10;               // Number of sectors of the kaleidoscope
   double fi = 2 * M_PI / n_sectors; // Triangle top angle
 
   // Offsets for indices of the YUV sections within the frame
