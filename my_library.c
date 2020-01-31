@@ -68,12 +68,12 @@ void my_crazy_function(uint8_t *yuvbuf_in, int width, int height,
 }
 
 /**
- * my_function
+ * kaleidoscope
  *
- * Implements the kaleidoscope effect with adjustable number of sectors
+ * Implements the kaleidoscope effect with an adjustable number of sectors
  */
-void my_function(uint8_t *yuvbuf_in, int width, int height,
-                 uint8_t *yuvbuf_out, int n_sectors) {
+void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
+                  uint8_t *yuvbuf_out, int n_sectors) {
 
   //---------------------------------------------------------------------------
   // Local variables
@@ -148,8 +148,8 @@ void my_function(uint8_t *yuvbuf_in, int width, int height,
       yuvbuf_out[v_off + uv_idx] = v;
 
       // 3. Clone the pixel to all other sectors
-      clone_pixel(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y,
-                    u, v, u_off, v_off);
+      clone_pixel(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y, u,
+                  v, u_off, v_off);
     } // End inner for - right triangle
 
     // 2.2 Print the left normal part of the triangle
@@ -178,8 +178,8 @@ void my_function(uint8_t *yuvbuf_in, int width, int height,
       yuvbuf_out[v_off + uv_idx] = v;
 
       // 3. Clone the pixel to all other sectors
-      clone_pixel(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y,
-                    u, v, u_off, v_off);
+      clone_pixel(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y, u,
+                  v, u_off, v_off);
     } // End inner for - left triangle
   }   // End outer for
 }
@@ -206,8 +206,9 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
   r = sqrt(w * w + h * h);
   theta = atan2(h, w);
 
-  // For all the sectors but the first one
-  for (int s = 1; s < n_sectors; ++s) {
+  // For all the sectors but the first one with a factor of 2 for
+  // optimisation on color smoothness in conjunction with item 6 below
+  for (int s = 1; s < n_sectors * 2; ++s) {
 
     // 3. Add the rotation factor to the angle and cover all quadrants!
     theta = (s % 2 != 0) ? theta + fi * s : theta - fi * s;
@@ -218,7 +219,7 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
 
     // 6. Write each pixel in other sectors at the respective place and in
     //    close proximity to avoid atan2 pitholes
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 3; ++i) {
       uv_idx = (h_dst / 2) * (width / 2) + (w_dst / 2);
       yuvbuf[h_dst * width + w_dst] = y;
       yuvbuf[u_off + uv_idx] = u;
