@@ -38,10 +38,10 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
   // 1. Dim the output image. Copied pixesl from the input will be bright anyway
   dim_image(yuvbuf_out, width, height, f_dim);
 
-  /* 2. Shrink the main triangle to create the basic 6 o' clock kaleidoscope 
+  /* 2. Shrink the main triangle to create the basic 6 o' clock kaleidoscope
   triangle. Construction of the triangle is performed in a bottom up fashion.
-  Shrinking is implemented by skipping every second pixel in the height 
-  dimension of the original triangle. Note that for a nested result we could 
+  Shrinking is implemented by skipping every second pixel in the height
+  dimension of the original triangle. Note that for a nested result we could
   do it a top/bottom approach */
   for (int h = height - 1; h >= 0; h -= 2) {
 
@@ -49,7 +49,8 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
     width_length = h * tan(fi / 2);
 
     // Width shrinking by skipping every second pixel in  width dimension
-    for (int w = width_mid - width_length; w <= width_mid + width_length; w += 2) {
+    for (int w = width_mid - width_length; w <= width_mid + width_length;
+         w += 2) {
 
       // Get the YUV values of the pixel from the main triangle
       uv_idx = (h / 2) * (width / 2) + (w / 2);
@@ -75,7 +76,7 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
 }
 
 //*****************************************************************************
-// Helper functions                                                           
+// Helper functions
 //*****************************************************************************
 
 /**
