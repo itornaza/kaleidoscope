@@ -13,6 +13,7 @@ Simple program to load a JPEG file, manipulate the data (YUV I420), and store th
 
 ## Running the program
 Cd to project root and run `make`
+
 Then run `./imageloader <input.jpg> <out.jpg>`
 
 ## Kaleidoscope video effect
