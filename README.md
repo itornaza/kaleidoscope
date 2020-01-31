@@ -1,4 +1,6 @@
-## Imageloader
+# Imageloader
+
+![Kaleidoscope](out-example.jpg)
 
 Simple program to load a JPEG file, manipulate the data (YUV I420), and store the result as a JPEG file.
 
@@ -23,8 +25,6 @@ The kaleidoscope function takes jpeg as an input, apply the kaleidoscope effect 
 Our kaleidoscope dims the pixels outside the kalidoscope rim and provides an option as to how many sectors the kaleidoscope may display.
 
 I420 YUV pixel format is explained in this [link](https://www.fourcc.org/pixel-format/yuv-i420/) more visual explanation at the bottom of this wikipedia [article](https://en.wikipedia.org/wiki/YUV).
-
-![Kaleidoscope](out-example.jpg)
 
 ## Implementation notes
 
