@@ -8,6 +8,8 @@
 /**
  * my_crazy_function
  *
+ * Please disregard in code review!
+ *
  * Designed for understanding of the YUV color space and creates a slightly
  * different radial kaleidoskope effect
  */
@@ -65,52 +67,65 @@ void my_crazy_function(uint8_t *yuvbuf_in, int width, int height,
   }
 }
 
+/**
+ * my_function
+ *
+ * Implements the kaleidoscope effect
+ */
 void my_function(uint8_t *yuvbuf_in, int width, int height,
                  uint8_t *yuvbuf_out) {
 
-  //-----------------------
+  //---------------------------------------------------------------------------
   // Local variables
-  //-----------------------
+  //---------------------------------------------------------------------------
 
   // Trigonometry
-  int n_sectors = 12;               // Number of sectors of the kaleidoscope
+  int n_sectors = 10;               // Number of sectors of the kaleidoscope
   double fi = 2 * M_PI / n_sectors; // Triangle top angle
 
-  // Offsets for indices of the YUV sections of the frame
+  // Offsets for indices of the YUV sections within the frame
   int u_off = width * height;
   int v_off = u_off + (width / 2) * (height / 2);
   int uv_idx;
 
   // Coordinates for the bottom triangle
-  int h_dst, w_dst;
   int height_mid = height / 2;
   int width_mid = width / 2;
+  int width_length; // The length of the bottom half-side of the main triangle
+  int h_dst;        // Destination pixel height
+  int w_dst;        // Destination pixel width
 
-  // Luminocity and colors values
+  // Luminocity and color channels
   uint8_t y, u, v;
+  int f_dim = 40; // Dimming factor
 
-  //-----------------------
-  // Pipeline
-  //-----------------------
+  //---------------------------------------------------------------------------
+  // Buffers
+  //---------------------------------------------------------------------------
 
-  // 0. Copy input image to another input and an output image 
   int buf_size = width * height * 3 / 2;
-  uint8_t *yuvbuf_in_2 = (uint8_t *) malloc(buf_size);
+  uint8_t *yuvbuf_in_2 = (uint8_t *)malloc(buf_size);
   memmove(yuvbuf_in_2, yuvbuf_in, buf_size);
   memmove(yuvbuf_out, yuvbuf_in, buf_size);
 
-  // 1. Dim the image
-  dim_image(yuvbuf_out, width, height);
+  //---------------------------------------------------------------------------
+  // Pipeline
+  //---------------------------------------------------------------------------
 
-  // 2. Shrink the main triangle to the bottom
+  // 1. Dim the image, everything copied from the orig will be bright again
+  dim_image(yuvbuf_out, width, height, f_dim);
+
+  // 2. Shrink the main triangle at the bottom to create the basic part
+
   // For every second pixel in the height dimension
   for (int h = 0; h < height; h += 2) {
 
     // Adjust h dependent variables
-    int width_length = h * tan(fi / 2);
+    width_length = h * tan(fi / 2);
 
     // 2.1 Print the right normal part of the triangle
-    // For every second pixel in the width dimension
+
+    // For every second pixel in the main triangle's width dimension
     for (int w = width_mid; w <= width_mid + width_length; w += 2) {
 
       // Adjust colorspace indices
@@ -133,11 +148,14 @@ void my_function(uint8_t *yuvbuf_in, int width, int height,
       yuvbuf_out[u_off + uv_idx] = u;
       yuvbuf_out[v_off + uv_idx] = v;
 
-      clone_sectors(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y, u, v);
+      // 3. Clone the pixel to all other sectors
+      clone_pixel(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y,
+                    u, v, u_off, v_off);
     } // End inner for - right triangle
 
     // 2.2 Print the left normal part of the triangle
-    // For every second pixel in the width dimension
+
+    // For every second pixel in the main triangle's width dimension
     for (int w = width_mid; w >= width_mid - width_length; w -= 2) {
 
       // Adjust colorspace indices
@@ -160,9 +178,11 @@ void my_function(uint8_t *yuvbuf_in, int width, int height,
       yuvbuf_out[u_off + uv_idx] = u;
       yuvbuf_out[v_off + uv_idx] = v;
 
-      clone_sectors(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y, u, v);
+      // 3. Clone the pixel to all other sectors
+      clone_pixel(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y,
+                    u, v, u_off, v_off);
     } // End inner for - left triangle
-  } // End outer for
+  }   // End outer for
 }
 
 /**
@@ -170,48 +190,55 @@ void my_function(uint8_t *yuvbuf_in, int width, int height,
  *
  *  Cppies every pixel of the scaled down triangle to the rest of the sectors
  */
-void clone_sectors(uint8_t *yuvbuf, int width, int height, int w, int h,
-                   double fi, int n_sectors, int y, int u, int v) {
+void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
+                 double fi, int n_sectors, int y, int u, int v, int u_off,
+                 int v_off) {
+  double r;     // Radious of a pixel from the center of the image
+  double theta; // Angle in respect to the center of the image
+  int h_dst;    // Destination pixel height coordinate
+  int w_dst;    // Destination pixel width coordinate
+  int uv_idx;   // Index alignment within the YUV frame
 
-  // 1. Convert cartesian to polar coordinates in respect to image middle
+  // 1. Shift origin from top left to the middle of the image
   h = h - height / 2;
   w = w - width / 2;
-  double r = sqrt(w * w + h * h);
-  double theta = atan2(h, w);
 
-  // For all the sectors except the first one
+  // 2. Get the polar coordinates in respect to the middle of the image
+  r = sqrt(w * w + h * h);
+  theta = atan2(h, w);
+
+  // For all the sectors but the first one
   for (int s = 1; s < n_sectors; ++s) {
 
-    // 2. Add the rotation factor to the angle and cover all quadrants!
-    if (s % 2 != 0) {
-      theta -= fi * s;
-    } else {
-      theta += fi * s;
-    }
+    // 3. Add the rotation factor to the angle and cover all quadrants!
+    theta = (s % 2 != 0) ? theta + fi * s : theta - fi * s;
 
-    // 3, Convert from polar to cartesian and print pixel at new position
-    int h_dst = r * sin(theta) + height / 2;
-    int w_dst = r * cos(theta) + width / 2;
+    // 4. Convert from polar to cartesian and print pixel at new position
+    h_dst = r * sin(theta) + height / 2;
+    w_dst = r * cos(theta) + width / 2;
 
-    // 4. Write the pixels to offseted sector
-    int u_off = width * height;
-    int v_off = u_off + (width / 2) * (height / 2);
-    int uv_idx = (h_dst / 2) * (width / 2) + (w_dst / 2);
-    yuvbuf[h_dst * width + w_dst] = y;
-    yuvbuf[u_off + uv_idx] = u;
-    yuvbuf[v_off + uv_idx] = v;
-  }
+    // 6. Write each pixel in other sectors at the respective place and in
+    //    close proximity to avoid atan2 pitholes
+    for (int i = 0; i < 4; ++i) {
+      uv_idx = (h_dst / 2) * (width / 2) + (w_dst / 2);
+      yuvbuf[h_dst * width + w_dst] = y;
+      yuvbuf[u_off + uv_idx] = u;
+      yuvbuf[v_off + uv_idx] = v;
+      --h_dst;
+      --w_dst;
+    } // End inner for
+  }   // End outer for
 }
 
 /**
  *  dim_image
- * 
- *  For all true pixels in the buffer use the mask to dim set pixels
+ *
+ *  Dim all pixels of the input buffer by the factor
  */
-void dim_image(uint8_t *yuvbuf, int width, int height) {
+void dim_image(uint8_t *yuvbuf, int width, int height, int f_dim) {
   for (int h = 0; h < height; ++h) {
     for (int w = 0; w < width; ++w) {
-      yuvbuf[h * width + w] -= 40;
+      yuvbuf[h * width + w] -= f_dim;
     }
   }
 }
