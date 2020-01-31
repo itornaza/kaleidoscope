@@ -24,6 +24,8 @@ Our kaleidoscope dims the pixels outside the kalidoscope rim and provides an opt
 
 I420 YUV pixel format is explained in this [link](https://www.fourcc.org/pixel-format/yuv-i420/) more visual explanation at the bottom of this wikipedia [article](https://en.wikipedia.org/wiki/YUV).
 
+![Kaleidoscope]('out-example.jpg')
+
 ## Implementation notes
 
 - Had to include the following library in the libjpeg.h to avoid the error
