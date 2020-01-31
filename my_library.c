@@ -6,14 +6,14 @@
 #include <string.h>
 
 /**
- * my_crazy_function
+ * arc_cloning
  *
  * Please disregard in code review!
  *
  * Designed for understanding of the YUV color space and creates a slightly
  * different radial kaleidoskope effect
  */
-void my_crazy_function(uint8_t *yuvbuf_in, int width, int height,
+void arc_cloning(uint8_t *yuvbuf_in, int width, int height,
                        uint8_t *yuvbuf_out) {
   memmove(yuvbuf_out, yuvbuf_in, width * height * 3 / 2);
 
@@ -184,10 +184,14 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
   }   // End outer for
 }
 
+//*****************************************************************************
+// Helper functions                                                           
+//*****************************************************************************
+
 /**
- *  clone_sectors
+ * clone_sectors
  *
- *  Cppies every pixel of the scaled down triangle to the rest of the sectors
+ * Copies every pixel of the scaled down triangle to the rest of the sectors
  */
 void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
                  double fi, int n_sectors, int y, int u, int v, int u_off,
@@ -231,9 +235,10 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
 }
 
 /**
- *  dim_image
+ * dim_image
  *
- *  Dim all pixels of the input buffer by the factor
+ * Dim all pixels of the input buffer by the factor using just the Luminance
+ * channel Y value
  */
 void dim_image(uint8_t *yuvbuf, int width, int height, int f_dim) {
   for (int h = 0; h < height; ++h) {
