@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
     assert(yuvbuf_out);
   }
 
-  /* Call out to "my function" */
   kaleidoscope(yuvbuf_in, width, height, yuvbuf_out, 10);
 
   write_i420_to_jpeg(yuvbuf_out, width, height, outpath);

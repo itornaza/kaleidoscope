@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-void arc_cloning(uint8_t *yuvbuf_in, int width, int height,
-                       uint8_t *yuvbuf_out);
-
 void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
                   uint8_t *yuvbuf_out, int n_sectors);
 
