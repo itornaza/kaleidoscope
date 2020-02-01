@@ -13,10 +13,6 @@
  */
 void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
                   uint8_t *yuvbuf_out, int n_sectors) {
-  // Buffers
-  int buf_size = width * height * 3 / 2;
-  memmove(yuvbuf_out, yuvbuf_in, buf_size);
-
   // Indices and offsets within the YUV sections of frame buffers
   int u_off = width * height;
   int v_off = u_off + (width / 2) * (height / 2);
@@ -34,11 +30,9 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
   int width_mid = width / 2;
   int width_length; // The length of the bottom half-side of the main triangle
 
-  /****************************************************************************
-   * >>====---------------           PIPELINE           ---------------====<< *
-   ****************************************************************************/
-
-  // 0. Enforce out-place execution
+  // Image buffers with enforced out-place execution policy
+  int buf_size = width * height * 3 / 2;
+  memmove(yuvbuf_out, yuvbuf_in, buf_size);
   uint8_t *yuvbuf_in_2 = NULL;
   if (yuvbuf_in == yuvbuf_out) {
     yuvbuf_in_2 = (uint8_t *)malloc(buf_size);
@@ -47,14 +41,18 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
     yuvbuf_in = yuvbuf_in_2;
   }
 
+  /****************************************************************************
+   * >>====---------------           PIPELINE           ---------------====<< *
+   ****************************************************************************/
+
   // 1. DIM the image
   dim_image(yuvbuf_out, width, height, f_dim);
 
-  /* 2. SHRINK the main triangle to create the basic 6 o' clock kaleidoscope
-  triangle. Construction of the triangle is performed in a bottom up fashion.
-  Vertical shrinking is implemented by skipping every second pixel in the height
-  dimension of the original triangle. A schematic of the geometry is included in
-  the README.md */
+  /* 2. SHRINK the main image triangle to create the basic 6 o' clock
+  kaleidoscope triangle. Construction of the triangle is performed in a bottom
+  up fashion. Vertical shrinking is implemented by skipping every second pixel
+  in the height dimension of the original triangle. A schematic of the geometry
+  is included in the README.md */
   for (int h = height - 1; h >= 0; h -= 2) {
     // Split the triangle base in two halfs
     width_length = h * tan(fi / 2);
@@ -121,14 +119,14 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
     h_dst = r * sin(theta) + height / 2;
     w_dst = r * cos(theta) + width / 2;
 
-    // Set new pixel value at the rotated position
+    // Set new pixel value at the rotated position plus four neighbors
     for (int i = 0; i <= 4; ++i) {
       uv_idx = (h_dst / 2) * (width / 2) + (w_dst / 2);
       yuvbuf[h_dst * width + w_dst] = y;
       yuvbuf[u_off + uv_idx] = u;
       yuvbuf[v_off + uv_idx] = v;
 
-      /* Paint some of the neighbor pixels for smoothing the kaleidoscope
+      /* Paint the following neighbor pixels for smoothing the kaleidoscope
       +-----------------+
       |     | i=0 |     |
       +-----------------+
@@ -141,7 +139,7 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
         h_dst--;
       } else if (i == 1) {
         h_dst += 2;
-      } else if (i == 2){
+      } else if (i == 2) {
         h_dst--;
         w_dst--;
       } else {
