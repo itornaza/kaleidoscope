@@ -38,3 +38,7 @@ I420 YUV pixel format is explained in this [link](https://www.fourcc.org/pixel-f
 ```
 
 - The kaleidoscope effect is implemented in the function `kaleidoscope` that is declared `my_library.h` and defined in `my_library.c`. Further, helper functions are used and defined after `kaleidoscope`.
+
+- The the main triangle and the basic 6 o' clock triangle of the kaleidoscope that are used during shrinking are shown below.
+
+![Trigonometry](schematic.png)

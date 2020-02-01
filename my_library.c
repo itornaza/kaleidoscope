@@ -12,10 +12,10 @@
  */
 void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
                   uint8_t *yuvbuf_out, int n_sectors) {
-  // Buffers
+  /* Buffers: We an input image to copy pixels from during the execution of the 
+  filter algorithm. if we need to execute it in place we will be needing a temp 
+  copy of the input image */
   int buf_size = width * height * 3 / 2;
-  uint8_t *yuvbuf_in_2 = (uint8_t *)malloc(buf_size);
-  memmove(yuvbuf_in_2, yuvbuf_in, buf_size);
   memmove(yuvbuf_out, yuvbuf_in, buf_size);
 
   // Offsets for indices of the YUV sections within the frame buffers
@@ -45,7 +45,7 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
   do it a top/bottom approach */
   for (int h = height - 1; h >= 0; h -= 2) {
 
-    // Adjust h dependent variables
+    // Split the base of the triangle in two halfs by using half of top angle
     width_length = h * tan(fi / 2);
 
     // Width shrinking by skipping every second pixel in  width dimension
@@ -54,9 +54,9 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
 
       // Get the YUV values of the pixel from the main triangle
       uv_idx = (h / 2) * (width / 2) + (w / 2);
-      y = yuvbuf_in_2[h * width + w];
-      u = yuvbuf_in_2[u_off + uv_idx];
-      v = yuvbuf_in_2[v_off + uv_idx];
+      y = yuvbuf_in[h * width + w];
+      u = yuvbuf_in[u_off + uv_idx];
+      v = yuvbuf_in[v_off + uv_idx];
 
       // Calculate the coordinates for the 6 o'clock triangle
       h_dst = height_mid + h / 2;
@@ -122,6 +122,10 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
       yuvbuf[v_off + uv_idx] = v;
       --h_dst; // Painting the neighbor pixels as well on each iteration
       --w_dst;
+      // Check we do not cross the image size boundaries
+      if (h_dst < 1 || h_dst > height - 1 || w_dst < 1 || w_dst > width - 1) {
+        break;
+      }
     } // End inner for
   }   // End outer for
 }
