@@ -39,14 +39,15 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
    ****************************************************************************/
 
   // 0. Enforce out-place execution
+  uint8_t *yuvbuf_in_2 = NULL;
   if (yuvbuf_in == yuvbuf_out) {
-    uint8_t *yuvbuf_in_2 = (uint8_t *)malloc(buf_size);
+    yuvbuf_in_2 = (uint8_t *)malloc(buf_size);
     assert(yuvbuf_in_2);
     memmove(yuvbuf_in_2, yuvbuf_in, buf_size);
     yuvbuf_in = yuvbuf_in_2;
   }
 
-  // 1. Dim the image
+  // 1. DIM the image
   dim_image(yuvbuf_out, width, height, f_dim);
 
   /* 2. SHRINK: The main triangle to create the basic 6 o' clock kaleidoscope
@@ -85,6 +86,12 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
                   v, u_off, v_off);
     } // End inner for
   }   // End outer for
+
+  // Clean up buffers
+  if (yuvbuf_in_2 != NULL) {
+    yuvbuf_in = yuvbuf_out;
+    free(yuvbuf_in_2);
+  }
 }
 
 /******************************************************************************
