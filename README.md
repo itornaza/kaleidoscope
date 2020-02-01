@@ -1,12 +1,12 @@
 # Imageloader
 
-![Kaleidoscope](out-example.jpg)
-
 Simple program to load a JPEG file, manipulate the data (YUV I420), and store the result as a JPEG file.
+
+- Depends on libjpeg
 
 - A kaleidoscope effect is included in my_library
 
-- Depends on libjpeg
+![Kaleidoscope](out-example.jpg)
 
 ## Install libjpeg
 - On Debian run `sudo apt-get install libjpeg-dev`
@@ -14,9 +14,9 @@ Simple program to load a JPEG file, manipulate the data (YUV I420), and store th
 - On windows follow the instructions [here](http://gnuwin32.sourceforge.net/packages/jpeg.htm)
 
 ## Running the program
-Cd to project root and run `make`
+Cd to project root and run: `make`
 
-Then run `./imageloader <input.jpg> <out.jpg>`
+Then run: `./imageloader <input.jpg> <out.jpg>`
 
 ## Kaleidoscope video effect
 
@@ -37,8 +37,8 @@ I420 YUV pixel format is explained in this [link](https://www.fourcc.org/pixel-f
 #endif
 ```
 
-- The kaleidoscope effect is implemented in the function `kaleidoscope` that is declared `my_library.h` and defined in `my_library.c`. Further, helper functions are used and defined after `kaleidoscope`.
+- The kaleidoscope effect is implemented in the function `kaleidoscope` that is declared `my_library.h` and defined in `my_library.c`. Further, helper functions are used and defined after the `kaleidoscope` function.
 
-- The the main triangle and the basic 6 o' clock triangle of the kaleidoscope that are used during shrinking are shown below.
+- The the main triangle and the basic 6 o' clock triangle of the kaleidoscope that are used during shrinking and rotating are shown below.
 
 ![Trigonometry](schematic.png)
