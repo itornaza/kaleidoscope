@@ -38,7 +38,7 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
    * >>====---------------           PIPELINE           ---------------====<< *
    ****************************************************************************/
 
-  // 0. Enforce out of place execution of the filter's algorithm
+  // 0. Enforce out-place execution
   if (yuvbuf_in == yuvbuf_out) {
     uint8_t *yuvbuf_in_2 = (uint8_t *)malloc(buf_size);
     assert(yuvbuf_in_2);
