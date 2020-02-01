@@ -6,7 +6,7 @@ Simple program to load a JPEG file, manipulate the data (YUV I420), and store th
 
 - A kaleidoscope effect is included in my_library
 
-![Kaleidoscope](out-example.jpg)
+![Kaleidoscope](out.jpg)
 
 ## Install libjpeg
 - On Debian run `sudo apt-get install libjpeg-dev`
