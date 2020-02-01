@@ -132,9 +132,9 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
       +-----------------+
       |     | i=0 |     |
       +-----------------+
-      | i=3 | dst | i=4 |
+      | i=2 | dst | i=3 |
       +-----------------+
-      |     | i=2 |     |
+      |     | i=1 |     |
       +-----------------+
       */
       if (i == 0) {
@@ -142,8 +142,6 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
       } else if (i == 1) {
         h_dst += 2;
       } else if (i == 2){
-        h_dst += 2;
-      } else if (i == 3) {
         h_dst--;
         w_dst--;
       } else {
