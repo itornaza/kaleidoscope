@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   uint8_t *yuvbuf_in = NULL;
   uint8_t *yuvbuf_out;
   int width, height;
-  int n_sectors = 6; // Number of sectors of the kaleidoscope
+  int n_sectors = 10; // Number of sectors for the kaleidoscope
 
   if (argc != 3) {
     fprintf(stderr, "Usage: %s <jpeg in> <jpeg out>\n", argv[0]);
