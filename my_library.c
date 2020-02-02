@@ -28,9 +28,9 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
   double fi = 2 * M_PI / n_sectors; // Triangle top angle
   int height_mid = height / 2;
   int width_mid = width / 2;
-  int width_length; // The length of the bottom half-side of the main triangle
+  int base_len; // Half the length of the bottom side of the triangle
 
-  // Image buffers with enforced out-place execution policy
+  // Image buffers with enforced out-place implementation policy
   int buf_size = width * height * 3 / 2;
   memmove(yuvbuf_out, yuvbuf_in, buf_size);
   uint8_t *yuvbuf_in_2 = NULL;
@@ -54,12 +54,10 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
   in the height dimension of the original triangle. A schematic of the geometry
   is included in the README.md */
   for (int h = height - 1; h >= 0; h -= 2) {
-    // Split the triangle base in two halfs
-    width_length = h * tan(fi / 2);
+    base_len = h * tan(fi / 2);
 
     // Shrink horizontaly by skipping every second pixel in width dimension
-    for (int w = width_mid - width_length; w <= width_mid + width_length;
-         w += 2) {
+    for (int w = width_mid - base_len; w <= width_mid + base_len; w += 2) {
       /* Get the YUV values of the pixel from the main triangle. These are
       still bright since they are comming straight from the input image */
       uv_idx = (h / 2) * (width / 2) + (w / 2);
@@ -71,7 +69,7 @@ void kaleidoscope(uint8_t *yuvbuf_in, int width, int height,
       h_dst = height_mid + h / 2;
       w_dst = width_mid + (w - width_mid) / 2;
 
-      // 3. ROTATE and copy the pixel color to all sectors
+      // 3. ROTATE and copy the pixel to the corresponding pixels in all sectors
       clone_pixel(yuvbuf_out, width, height, w_dst, h_dst, fi, n_sectors, y, u,
                   v, u_off, v_off);
     } // End inner for
@@ -103,38 +101,29 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
   int w_dst;    // Destination pixel width coordinate
   int uv_idx;   // Index alignment within the YUV frame
 
-  // Shift the coordinates origin from top left to the middle of the image
+  // Shift the coordinates origin from the top left to the middle of the image
   h = h - height / 2;
   w = w - width / 2;
 
-  // Convert the pixel's cartesian coordinates (h, w) to polar (r, θ)
+  // Convert the pixel's coordinates from cartesian (h, w) to polar (r, θ)
   r = sqrt(w * w + h * h);
   theta = atan2(h, w);
 
   for (int s = 0; s < n_sectors; ++s) {
-    // Add the rotation factor to the angle while covering all quadrants
+    // Add the rotation factor to the base angle while covering all quadrants
     theta = (s % 2 != 0) ? theta + fi * s : theta - fi * s;
 
-    // Convert coordinates from polat back to cartesian readjusting the origin
+    // Convert coordinates from polat back to cartesian while reseting origin
     h_dst = r * sin(theta) + height / 2;
     w_dst = r * cos(theta) + width / 2;
 
-    // Set new pixel value at the rotated position plus four neighbors
-    for (int i = 0; i <= 4; ++i) {
+    /* Paint the pixel at the rotated position plus the top, bottom, left and 
+    right neighbors for image smoothness */
+    for (int i = 0; i < 5; ++i) {
       uv_idx = (h_dst / 2) * (width / 2) + (w_dst / 2);
       yuvbuf[h_dst * width + w_dst] = y;
       yuvbuf[u_off + uv_idx] = u;
       yuvbuf[v_off + uv_idx] = v;
-
-      /* Paint the following neighbor pixels for smoothing the kaleidoscope
-      +-----------------+
-      |     | i=0 |     |
-      +-----------------+
-      | i=2 | dst | i=3 |
-      +-----------------+
-      |     | i=1 |     |
-      +-----------------+
-      */
       if (i == 0) {
         h_dst--;
       } else if (i == 1) {
@@ -144,7 +133,7 @@ void clone_pixel(uint8_t *yuvbuf, int width, int height, int w, int h,
         w_dst--;
       } else {
         w_dst += 2;
-      } // End if / else
+      } // End if/else
 
       // Check we do not cross the image boundaries
       if (h_dst < 1 || h_dst > height - 1 || w_dst < 1 || w_dst > width - 1) {

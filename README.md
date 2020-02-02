@@ -20,11 +20,11 @@ Then run: `./imageloader <input.jpg> <out.jpg>`
 
 ## Kaleidoscope video effect
 
-The kaleidoscope function takes jpeg as an input, apply the kaleidoscope effect similar to how it is shown in [this video](https://www.youtube.com/watch?v=SbQJKjORQJk) and saves the result in a jpeg file. The effect as it is shown in the video has multiple processing stages such as: dimming the background, scaling down the image and then moving the pixels around to create the kaleidoscope effect. 
+The kaleidoscope function takes jpeg as an input, applies the kaleidoscope effect similar to how it is shown in [this video](https://www.youtube.com/watch?v=SbQJKjORQJk) and saves the result in a jpeg file. The effect as it is shown in the video has multiple processing stages such as: dimming the background, scaling down the image and then moving the pixels around to create the kaleidoscope effect. 
 
 Our kaleidoscope dims the pixels outside the kalidoscope rim and provides an option as to how many sectors the kaleidoscope may display.
 
-I420 YUV pixel format is explained in this [link](https://www.fourcc.org/pixel-format/yuv-i420/) more visual explanation at the bottom of this wikipedia [article](https://en.wikipedia.org/wiki/YUV).
+I420 YUV pixel format is explained in this [link](https://www.fourcc.org/pixel-format/yuv-i420/). More visual explanation at the bottom of this wikipedia [article](https://en.wikipedia.org/wiki/YUV).
 
 ## Implementation notes
 
@@ -37,8 +37,8 @@ I420 YUV pixel format is explained in this [link](https://www.fourcc.org/pixel-f
 #endif
 ```
 
-- The kaleidoscope effect is implemented in the function `kaleidoscope` that is declared `my_library.h` and defined in `my_library.c`. Further, helper functions are used and defined after the `kaleidoscope` function.
+- The kaleidoscope effect is implemented in the function `kaleidoscope` that is declared `my_library.h` and defined in `my_library.c`. Further, some helper functions are used and are defined after the `kaleidoscope` function.
 
-- The the main triangle and the basic 6 o' clock triangle of the kaleidoscope that are used during shrinking and rotating are shown below.
+- The the main triangle and the basic 6 o' clock triangle of the kaleidoscope that are used during 'shrink and rotate' are shown below.
 
 ![Trigonometry](schematic.png)

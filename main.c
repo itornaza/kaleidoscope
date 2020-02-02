@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
   uint8_t *yuvbuf_in = NULL;
   uint8_t *yuvbuf_out;
   int width, height;
+  int n_sectors = 6; // Number of sectors of the kaleidoscope
 
   if (argc != 3) {
     fprintf(stderr, "Usage: %s <jpeg in> <jpeg out>\n", argv[0]);
@@ -32,7 +33,7 @@ int main(int argc, char *argv[]) {
     assert(yuvbuf_out);
   }
 
-  kaleidoscope(yuvbuf_in, width, height, yuvbuf_out, 10);
+  kaleidoscope(yuvbuf_in, width, height, yuvbuf_out, n_sectors);
 
   write_i420_to_jpeg(yuvbuf_out, width, height, outpath);
 
